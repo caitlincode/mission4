@@ -1,6 +1,13 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const apiKey = process.env.GEMINI_API_KEY;
+if (!apiKey) {
+  throw new Error("GEMINI_API_KEY is missing in the .env file");
+}
+
 const genAI = new GoogleGenerativeAI(apiKey);
 
 const model = genAI.getGenerativeModel({
@@ -8,12 +15,18 @@ const model = genAI.getGenerativeModel({
 });
 
 const generationConfig = {
-  temperature: 1,
+  temperature: 0.7,
   topP: 0.95,
   topK: 40,
-  maxOutputTokens: 8192,
+  maxOutputTokens: 256,
   responseMimeType: "text/plain",
 };
+
+const context = `
+- Mechanical Breakdown Insurance (MBI): Covers repair costs for unexpected mechanical failures. Not available for trucks or racing cars.
+- Comprehensive Car Insurance: Covers both your car and others in an accident. Available only for vehicles under 10 years old.
+- Third Party Car Insurance: Covers damages to other people's property.
+`;
 
 export async function generateResponse(userMessage) {
   const chatSession = model.startChat({
@@ -22,19 +35,9 @@ export async function generateResponse(userMessage) {
       {
         role: "user",
         parts: [
-          {text: "You are Tina, an AI insurance consultant. Your task is to recommend insurance options..."},
-        ],
-      },
-      {
-        role: "model",
-        parts: [
-          {text: "Hello! I'm Tina, your AI insurance consultant. Let's start by understanding your insurance needs."},
-        ],
-      },
-      {
-        role: "user",
-        parts: [
-          {text: userMessage},
+          {
+            text: `You are Tina, an AI insurance consultant. Use the following context to assist the user: ${context} User's question: ${userMessage}`,
+          },
         ],
       },
     ],
