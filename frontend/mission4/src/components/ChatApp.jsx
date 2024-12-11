@@ -1,83 +1,78 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-// ChatWindow component to display chat history
-const ChatWindow = ({ chatHistory }) => (
-  <div className="chat-window">
-    {chatHistory.map((entry, index) => (
-      <div key={index} className={`message ${entry.sender}`}>
-        <strong>{entry.sender === "user" ? "You" : "Tina"}:</strong>
-        <p>{entry.message}</p>
-      </div>
-    ))}
-  </div>
-);
-
-// ChatInput component to handle user input
-const ChatInput = ({ userMessage, handleUserMessageChange, handleSendMessage }) => (
-  <div className="input-container">
-    <input
-      type="text"
-      value={userMessage}
-      onChange={handleUserMessageChange}
-      placeholder="Ask Tina about insurance..."
-    />
-    <button onClick={handleSendMessage}>Send</button>
-  </div>
-);
-
-// Main ChatApp component
 const ChatApp = () => {
+  const [chatHistory, setChatHistory] = useState([]); // Holds the conversation history
   const [userMessage, setUserMessage] = useState(""); // User's input message
-  const [chatHistory, setChatHistory] = useState([]); // Holds the chat history (user and Tina)
+  const [loading, setLoading] = useState(true); // Indicates if the initial message is being fetched
 
-  // Handle changes in the user input field
-  const handleUserMessageChange = (e) => {
-    setUserMessage(e.target.value);
-  };
+  // Fetch Tina's initial message when the page loads
+  useEffect(() => {
+    const fetchInitialMessage = async () => {
+      try {
+        const response = await axios.post("http://localhost:5000/api/ask", {
+          userResponse: "", // No user input for the initial message
+          conversationHistory: [], // Empty conversation history
+        });
+        setChatHistory(response.data.conversationHistory); // Update chat history with Tina's first message
+      } catch (error) {
+        console.error("Error fetching initial message:", error);
+      } finally {
+        setLoading(false); // Stop loading spinner after fetching
+      }
+    };
 
-  // Handle sending the message
+    fetchInitialMessage();
+  }, []);
+
+  // Handle sending user messages
   const handleSendMessage = async () => {
-    if (!userMessage.trim()) return; // Don't send if the input is empty
+    if (!userMessage.trim()) return; // Prevent sending empty messages
 
-    // Add user message to chat history
-    setChatHistory((prev) => [
-      ...prev,
-      { sender: "user", message: userMessage },
-    ]);
+    // Add the user's message to the chat history
+    const updatedHistory = [
+      ...chatHistory,
+      { role: "user", parts: [{ text: userMessage }] },
+    ];
+
+    setChatHistory(updatedHistory); // Update chat history in the UI
 
     try {
-      // Send the user message to the backend (API)
+      // Send the user's message and conversation history to the backend
       const response = await axios.post("http://localhost:5000/api/ask", {
-        userMessage,
+        userResponse: userMessage,
+        conversationHistory: updatedHistory,
       });
-
-      // Add Tina's response to the chat history
-      setChatHistory((prev) => [
-        ...prev,
-        { sender: "tina", message: response.data.answer },
-      ]);
+      setChatHistory(response.data.conversationHistory); // Update chat history with Tina's response
     } catch (error) {
-      // Handle error from backend and notify user
-      setChatHistory((prev) => [
-        ...prev,
-        { sender: "tina", message: "Sorry, there was an error processing your request." },
-      ]);
+      console.error("Error sending message:", error);
     }
 
-    // Clear the input field after sending
-    setUserMessage("");
+    setUserMessage(""); // Clear the input field
   };
 
   return (
-    <div className="chat-app">
+    <div>
       <h1>Talk to Tina!</h1>
-      <ChatWindow chatHistory={chatHistory} />
-      <ChatInput
-        userMessage={userMessage}
-        handleUserMessageChange={handleUserMessageChange}
-        handleSendMessage={handleSendMessage}
+      <div>
+        {loading ? (
+          <p>Loading Tina...</p>
+        ) : (
+          chatHistory.map((entry, index) => (
+            <div key={index} className={entry.role}>
+              <strong>{entry.role === "user" ? "You" : "Tina"}:</strong>{" "}
+              {entry.parts[0].text}
+            </div>
+          ))
+        )}
+      </div>
+      <input
+        type="text"
+        value={userMessage}
+        onChange={(e) => setUserMessage(e.target.value)}
+        placeholder="Type your message here..."
       />
+      <button onClick={handleSendMessage}>Send</button>
     </div>
   );
 };
