@@ -1,77 +1,121 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  
-  body {
-    font-family: Arial, sans-serif;
-    background-color: #f8f9fa;
-    padding: 20px;
-  }
-  
-  .chat-app {
-    max-width: 600px;
-    margin: 0 auto;
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
-  
-  h1 {
-    text-align: center;
-    color: #4caf50;
-  }
-  
-  .chat-window {
-    max-height: 400px;
-    overflow-y: auto;
-    margin-bottom: 20px;
-  }
-  
-  .message {
-    margin: 10px 0;
-    padding: 10px;
-    border-radius: 8px;
-    max-width: 80%;
-  }
-  
-  .message.user {
-    background-color: #4caf50;
-    color: white;
-    text-align: right;
-  }
-  
-  .message.tina {
-    background-color: #f1f1f1;
-    color: #333;
-    text-align: left;
-  }
-  
-  .input-container {
-    display: flex;
-    justify-content: space-between;
-  }
-  
-  input {
-    width: 80%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-  
-  button {
-    width: 15%;
-    padding: 10px;
-    border: none;
-    background-color: #4caf50;
-    color: white;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  button:hover {
-    background-color: #45a049;
-  }
-  
+/* General page styling */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f8f9fa;
+  margin: 0;
+  padding: 0;
+  background: url('./assets/turners.jpg') no-repeat center center fixed; /* Background image */
+  background-size: cover; /* Ensure the image covers the entire background */
+  position: relative; /* Needed for the overlay */
+}
+
+body::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.5); /* Adjusted to 50% transparency */
+  z-index: -1; /* Place it behind the other content */
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  position: relative; /* Keep content above the overlay */
+}
+
+header {
+  background-color: #007bff;
+  color: #fff;
+  padding: 20px 0;
+  text-align: center;
+  position: relative; /* Ensure header is above the overlay */
+}
+
+h1 {
+  margin: 0;
+}
+
+/* Chatbot styling */
+.chat-app {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 300px;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-history {
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+  padding: 10px;
+  background-color: #f4f4f4;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.chat-entry {
+  margin-bottom: 10px;
+  display: flex;
+  align-items: flex-start;
+}
+
+.chat-entry.user {
+  justify-content: flex-end;
+}
+
+.chat-entry.tina {
+  justify-content: flex-start;
+}
+
+.chat-bubble {
+  max-width: 80%;
+  padding: 10px;
+  border-radius: 10px;
+  margin: 5px;
+}
+
+.chat-entry.user .chat-bubble {
+  background-color: #007bff;
+  color: #fff;
+  border-bottom-right-radius: 0;
+}
+
+.chat-entry.tina .chat-bubble {
+  background-color: #e5e5ea;
+  color: #000;
+  border-bottom-left-radius: 0;
+}
+
+input[type="text"] {
+  width: calc(100% - 60px);
+  padding: 10px;
+  margin-right: 10px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+button {
+  padding: 10px;
+  border: none;
+  background-color: #007bff;
+  color: #fff;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}

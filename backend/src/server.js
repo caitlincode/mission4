@@ -1,8 +1,8 @@
-// Load environment variables from .env file
 import express from "express";
 import dotenv from "dotenv";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import bodyParser from "body-parser";
+import cors from "cors";
 
 dotenv.config();
 
@@ -19,6 +19,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const app = express();
 
 // Middleware
+app.use(cors());
 app.use(bodyParser.json());
 
 // Define the system prompt for Tina
@@ -63,7 +64,10 @@ app.post("/api/ask", async (req, res) => {
 
     // Tina starts the conversation
     conversationHistory.push(initialMessage);
-    return res.json({ aiResponse: initialMessage.parts[0].text, conversationHistory });
+    return res.json({
+      aiResponse: initialMessage.parts[0].text,
+      conversationHistory,
+    });
   }
 
   // Add the user's response to the conversation history
